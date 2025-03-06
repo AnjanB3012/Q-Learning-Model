@@ -3,6 +3,11 @@ import time
 import Model
 import tqdm
 
+
+"""
+This file is the file to train the flappy bird into a model.
+-> The file uses the Model.py to create a model and train it.
+"""
 def computeDetails(inputDetails):
     global oldY, oldTop, oldBottom, oldX
     if(abs(inputDetails[0]-oldY)>10

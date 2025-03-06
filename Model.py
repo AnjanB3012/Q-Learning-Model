@@ -5,31 +5,6 @@ import xml.etree.ElementTree as ET
 import ast
 import os
 
-
-def loadModel(modelName, inputLearningRate, inputDiscountFactor, inputEpsilon):
-        tree = ET.parse(modelName)
-        root = tree.getroot()
-        highestID = 0
-        tempQTable = {}
-        outcomes = []
-        for qNode in root.findall("node"):
-            node_id = int(qNode.get("id"))
-            tempSituation = ast.literal_eval(qNode.find("situation").text)
-            for i in range(len(tempSituation)):
-                tempSituation[i] = float(tempSituation[i])
-            tempOutcome = int(qNode.find("outcome").text)
-            if(tempOutcome not in outcomes):
-                outcomes.append(tempOutcome)
-            tempQ = float(qNode.find("Q").text)
-            if(node_id>highestID):
-                highestID=node_id
-            tempQObj = Q.Q(tempSituation,tempOutcome,nodeId=node_id)
-            tempQObj.setQ(tempQ)
-            tempQTable[tempQObj] = tempQ
-        returningModel = Model(inputLearningRate,inputDiscountFactor,inputEpsilon,outcomes,tempQTable,None,highestID+1)
-        return returningModel
-
-
 class Model:
     def __init__(self, learning_rate: float, discount_factor: float, epsilon:float, possible_Outcomes: list, qTable={},ln=None,lID=0):
         self.learning_rate = learning_rate
@@ -42,7 +17,11 @@ class Model:
 
     def compute(self, situation: list) -> int:
         """
-        Gives the output from the models q table or adds a point in the q table
+        Gives the output from the models q table or adds a point in the q table. 
+        -> The model uses epsilon greedy policy to decide whether to explore or exploit.
+        -> If the situation is not in the q table, it creates a new node for the situation.
+        -> If the situation is in the q table, it finds the node with the highest Q value and returns the outcome of that node.
+        -> If the epsilon value is greater than a random number between 0 and 1, it explores the q table and returns a random outcome.
 
         Args:
             situation (list): The situation the agent is in.
@@ -80,6 +59,14 @@ class Model:
             return returningNode.getOutcome()
         
     def train(self, reward:int):
+        """
+        Updates the Q value of the last node using the reward and the Q value of the next state.
+        -> The model uses the Q learning formula to update the Q value of the last node.
+        -> The model uses the learning rate, discount factor, and the reward to update the Q value of the last node.
+
+        Args:
+            reward (int): The reward the agent gets from the environment.
+        """
         z = self.__lastNode.getQ()
         a = self.learning_rate
         b = reward
@@ -91,6 +78,17 @@ class Model:
         self.q_table[self.__lastNode] = self.__lastNode.getQ()
 
     def findOrNullQ(self, situation: list) -> list|None:
+        """
+        Finds the Q nodes that are in the same state as the given state.
+        -> If there is no node in the q table with the given state, it returns None.
+        -> If there are nodes in the q table with the given state, it returns the list of nodes.
+
+        Args:
+            situation (list): The state the agent is in.
+        
+        Returns:
+            list|None: The list of nodes that are in the same state as the given state or None.
+        """
         resultNodes = []
         for qNode in self.q_table:
             if(qNode.getSituation()==situation):
@@ -101,6 +99,15 @@ class Model:
             return resultNodes
         
     def getMaxQinNodes(self, nodeList:list) -> Q:
+        """
+        Finds the Q node with the highest Q value in the given list of nodes.
+        
+        Args:
+            nodeList (list): The list of nodes to find the node with the highest Q value.
+        
+        Returns:
+            Q: The node with the highest Q value in the given list of nodes.
+        """
         maxNode = random.choice(list(self.q_table.keys()))
         for qNode in nodeList:
             if(qNode.getOutcome()>maxNode.getOutcome()):
@@ -108,16 +115,35 @@ class Model:
         return maxNode
     
     def findClosestState(self, situation: list) -> list:
+        """
+        Finds the closest state to the provided state in the already trained states.
+        -> The model uses the Euclidean distance to find the closest state.
+        -> The model finds the state with the smallest Euclidean distance to the provided state and returns that state.
+
+        Args:
+            situation (list): The state the agent is in.
+        """
         closestNode = None
-        closestNodeDistance = 0
+        closestNodeDistance = float("inf")
         for qNode in self.q_table:
             tempDistance = self.calculateDistance(qNode.getSituation(),situation)
-            if(tempDistance>closestNodeDistance):
+            if(tempDistance<closestNodeDistance):
                 closestNodeDistance = tempDistance
                 closestNode = qNode
         return closestNode.getSituation()
 
     def calculateDistance(self, point1:list, point2: list) -> float:
+        """
+        The function that calculates the Euclidean distance between two points.
+        -> The model uses the Euclidean distance formula to calculate the distance between two points.
+
+        Args:
+            point1 (list): The first point to calculate the distance.
+            point2 (list): The second point to calculate the distance.
+        
+        Returns:
+            float: The Euclidean distance between the two points.
+        """
         squares = []
         for p1 in point1:
             for p2 in point2:
@@ -126,6 +152,13 @@ class Model:
         return math.sqrt(squaresSum)
 
     def saveModel(self,modelName):
+        """
+        The function that saves the model as an XML file.
+        -> The model saves the model as an XML file to use it in the future.
+
+        Args:
+            modelName (str): The name of the model to save.
+        """
         if os.path.exists(f"{modelName}.xml"):
             os.remove(f"{modelName}.xml")
         root = ET.Element("nodes")
@@ -141,3 +174,39 @@ class Model:
         with open(f"{modelName}.xml","wb") as xml_file:
             tree.write(xml_file, encoding="utf-8", xml_declaration=True)
         print(f"XML file '{modelName}.xml' created successfully!")
+
+
+def loadModel(modelName: str, inputLearningRate: float, inputDiscountFactor: float, inputEpsilon: float) -> Model:
+        """
+        This function is designed to convert an XML into the model class to use it in an application.
+
+        Args:
+            modelName (str): The XML filepath of the saved model.
+            inputLearningRate (float): The new learning rate for the model to update itself in the upcoming states.
+            inputDiscountFactor (float): The new discount factor for the model to update itself in the upcoming states.
+            inputEpsilon (float): The new epsilon value for the model to update itself in the upcoming states.
+        
+        Returns:
+            Model: The model class with the new parameters.
+        """
+        tree = ET.parse(modelName)
+        root = tree.getroot()
+        highestID = 0
+        tempQTable = {}
+        outcomes = []
+        for qNode in root.findall("node"):
+            node_id = int(qNode.get("id"))
+            tempSituation = ast.literal_eval(qNode.find("situation").text)
+            for i in range(len(tempSituation)):
+                tempSituation[i] = float(tempSituation[i])
+            tempOutcome = int(qNode.find("outcome").text)
+            if(tempOutcome not in outcomes):
+                outcomes.append(tempOutcome)
+            tempQ = float(qNode.find("Q").text)
+            if(node_id>highestID):
+                highestID=node_id
+            tempQObj = Q.Q(tempSituation,tempOutcome,nodeId=node_id)
+            tempQObj.setQ(tempQ)
+            tempQTable[tempQObj] = tempQ
+        returningModel = Model(inputLearningRate,inputDiscountFactor,inputEpsilon,outcomes,tempQTable,None,highestID+1)
+        return returningModel

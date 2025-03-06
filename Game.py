@@ -2,27 +2,23 @@ import pygame
 import random
 import time
 
-# Initialize Pygame
 pygame.init()
 
-# Screen dimensions
 WIDTH, HEIGHT = 500, 500
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird Clone")
 
-# Colors
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
-# Game settings
 GRAVITY = 1
 JUMP_STRENGTH = 5.7
 PILLAR_GAP = 120
 PILLAR_WIDTH = 50
 PILLAR_SPEED = 2
-FPS = 30  # More typical frame rate
+FPS = 30
 
 
 class Game:
@@ -32,8 +28,6 @@ class Game:
         self.bird_velocity = 0
         self.running = True
         self.status_code = 0
-
-        # Initialize first pillar
         self.pillar_x = WIDTH
         self.pillar_top = random.randint(50, HEIGHT - PILLAR_GAP - 50)
         self.pillar_bottom = self.pillar_top + PILLAR_GAP
@@ -50,10 +44,10 @@ class Game:
 
     def close(self):
         """Hides the game window."""
-        # pygame.display.quit()
         self.window_open = False
 
     def quitGame(self):
+        """Quits the entire game."""
         pygame.display.quit()
         self.window_open = False
 
@@ -109,8 +103,8 @@ class Game:
         pygame.display.update()
 
 
-# Run the game externally using a loop
 if __name__ == "__main__":
+    """Runs the game externally in a loop for testing."""
     game = Game()
     clock = pygame.time.Clock()
     game.show()

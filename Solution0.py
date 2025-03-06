@@ -3,6 +3,9 @@ import time
 import Model
 import tqdm
 
+"""
+This file displays the result of the saved model.
+"""
 def computeDetails(inputDetails):
     global oldY, oldTop, oldBottom, oldX
     if(abs(inputDetails[0]-oldY)>10
@@ -28,7 +31,7 @@ for epoch in tqdm.tqdm(range(0,1000)):
     game = Game.Game()
     game.show()
     while breakBool:
-        time.sleep(0.001)
+        time.sleep(0.01)
         if(computeDetails(game.getDetails())):
             calcOn = True
             returnededPred = gameModel.compute([oldY,oldTop,oldBottom,oldX])
