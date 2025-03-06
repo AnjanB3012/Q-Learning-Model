@@ -22,7 +22,7 @@ def computeDetails(inputDetails):
 
 
 gameModel = Model.Model(0.01,0.9,0.4,[0,1])
-# gameModel = Model.loadModel("model1.xml",0.3,0.98,0)
+# gameModel = Model.loadModel("models/model1.xml",0.3,0.98,0)
 oldY = 0
 oldTop = 0
 oldBottom = 0
@@ -59,11 +59,11 @@ for epoch in tqdm.tqdm(range(0,100)):
         game.draw()
     breakBool = True
 
-gameModel.saveModel("model1")
+gameModel.saveModel("models/model1")
 
 a = input("Retrain?")
 while a=="":
-    gameModel = Model.loadModel("model1.xml",0.1,0.98,0.15)
+    gameModel = Model.loadModel("models/model1.xml",0.1,0.98,0.15)
     oldY = 0
     oldTop = 0
     oldBottom = 0
@@ -97,5 +97,5 @@ while a=="":
             game.draw()
         breakBool = True
 
-    gameModel.saveModel("model1")
+    gameModel.saveModel("models/model1")
     a = input("Retrain?")
