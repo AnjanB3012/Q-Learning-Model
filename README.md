@@ -1,41 +1,57 @@
 # Q-Learning-Model
-Flappy Bird Reinforcement Learning (Q-Learning & Beyond)
-🚀 An RL-based Flappy Bird agent that learns to survive by optimizing its movements using Q-learning.
-Currently trained using a Q-table, with plans to migrate to DQN for better scalability.
+🐦 Reinforcement Learning for Flappy Bird (Q-Learning from Scratch)
 
-📌 Project Overview
-This project uses Q-learning to train an agent to play Flappy Bird autonomously.
-The goal is to make the model:
-✅ Learn from past experiences
-✅ Maximize long-term survival
-✅ Handle difficult scenarios like extreme pillar gaps
-✅ Improve training efficiency and scalability
+🚀 Overview
 
-Current Features
-✅ Q-learning implementation with a lookup table
-✅ Experience replay stored in XML
-✅ Dynamic reward function based on survival and obstacle clearance
+This project implements a Q-learning agent to play Flappy Bird autonomously. The model learns to navigate obstacles, time jumps, and survive longer through reinforcement learning. Unlike prebuilt AI frameworks, this implementation is from scratch, focusing on manual Q-table updates and optimization.
 
-📊 Challenges & Setbacks
-1️⃣ Incorrect State Proximity Calculation 🧩
-🔴 Problem: The agent mistakenly learned from the farthest Q-value instead of the closest, leading to incorrect updates.
-✅ Fix: Corrected the proximity function to select the nearest state.
+💡 Features
 
-2️⃣ Over-Penalizing Early Training Phases ⛔
-🔴 Problem: The agent received 10x harsher punishment in early training, making it too risk-averse.
-✅ Fix: Standardized reward scaling across all training phases.
+-> Q-learning implementation with a lookup table.
 
-3️⃣ Agent Struggled with Extreme Gaps 🎯
-🔴 Problem: The agent performed well on small pillar variations but failed when gaps were drastically high/low.
-✅ Fix: Improved state representation by adding bird velocity and increasing discount factor (γ) for better long-term planning.
+-> Epsilon-greedy action selection for balanced exploration and exploitation.
 
-🔜 Next Steps
-🔹 Optimize training efficiency by introducing multi-threading.
-🔹 Implement CUDA-based Q-table updates for faster training.
-🔹 Migrate from Q-table to Deep Q-Networks (DQN) for scalability.
-🔹 Improve generalization to handle unseen pillar variations better.
+-> Experience replay for improving training efficiency.
 
-📝 Lessons Learned
-✅ Reinforcement Learning requires deep debugging—mistakes often go unnoticed until training breaks down.
-✅ Reward function tuning is critical—wrong scaling can ruin learning stability.
-✅ Q-learning struggles with large state-action spaces, requiring optimization techniques like shared instances and function approximation.
+-> State proximity matching using Euclidean distance.
+
+-> Separate Training and Testing modes for reliable evaluation.
+
+📊 Challenges & Debugging Fixes
+
+1. Fixed Incorrect Q-Value Selection in getMaxQinNodes()
+
+Issue: The agent previously selected actions based on outcome labels instead of Q-values.
+Fix: Now correctly selects the action with the highest Q-value.
+
+2. Fixed Over-Reliance on Random Actions in Testing
+
+Issue: The agent was randomly adding new states to the Q-table in test mode, causing unpredictable behavior.
+Fix: Disabled random Q-table insertions in test mode, ensuring it only uses learned Q-values.
+
+3. Balanced Exploration & Exploitation
+
+Issue: High epsilon (ε) caused excessive randomness, preventing stable learning.
+Fix: Implemented faster epsilon decay so the agent shifts to exploiting learned strategies sooner.
+
+4. Prevented Over-Punishment for Falling
+
+Issue: Overly strong penalties disrupted learning.
+Fix: Adjusted reward scaling to maintain a stable learning rate.
+
+5. Fixed Invalid State Lookups in findClosestState()
+
+Issue: The function sometimes returned completely unrelated states, corrupting training.
+Fix: Now ensures only valid states are used for lookups.
+
+🚀 Next Steps
+
+-> Optimize reward function for more efficient learning.
+
+-> Train beyond 1,000+ epochs to enhance Q-value convergence.
+
+-> Transition to Deep Q-Networks (DQN) for function approximation.
+
+-> Experiment with different state representations for better generalization.
+
+🔄 Last Updated: March 2025

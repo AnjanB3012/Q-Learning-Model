@@ -58,6 +58,14 @@ class Model:
             self.__lastNode = returningNode
             return returningNode.getOutcome()
         
+    def getOutcome(self, situation: list) -> int:
+        matchingSituations = self.findOrNullQ(situation=situation)
+        if(matchingSituations==None):
+            closestState = self.findClosestState(situation=situation)
+            matchingSituations = self.findOrNullQ(situation=closestState)
+        maxQinState = self.getMaxQinNodes(matchingSituations)
+        return maxQinState.getOutcome()
+        
     def train(self, reward:int):
         """
         Updates the Q value of the last node using the reward and the Q value of the next state.
@@ -108,9 +116,11 @@ class Model:
         Returns:
             Q: The node with the highest Q value in the given list of nodes.
         """
-        maxNode = random.choice(list(self.q_table.keys()))
+        if(nodeList==[]):
+            return None
+        maxNode = nodeList[0]
         for qNode in nodeList:
-            if(qNode.getOutcome()>maxNode.getOutcome()):
+            if(qNode.getQ()>maxNode.getQ()):
                 maxNode = qNode
         return maxNode
     

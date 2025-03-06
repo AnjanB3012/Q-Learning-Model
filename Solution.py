@@ -31,7 +31,7 @@ prevX = 0
 
 breakBool = True
 calcOn = False
-for epoch in tqdm.tqdm(range(0,100)):
+for epoch in tqdm.tqdm(range(0,50)):
     game = Game.Game()
     # game.show()
     while breakBool:
@@ -46,7 +46,7 @@ for epoch in tqdm.tqdm(range(0,100)):
 
         if game.status_code in [-1, -2]:
             if(calcOn):
-                gameModel.train(game.status_code*10)
+                gameModel.train(game.status_code*100)
                 calcOn = False
             breakBool = False
         if(calcOn):
@@ -59,11 +59,11 @@ for epoch in tqdm.tqdm(range(0,100)):
         game.draw()
     breakBool = True
 
-gameModel.saveModel("models/model1")
+gameModel.saveModel("model1")
 
 a = input("Retrain?")
 while a=="":
-    gameModel = Model.loadModel("models/model1.xml",0.1,0.98,0.15)
+    gameModel = Model.loadModel("model1.xml",0.1,0.98,0.15)
     oldY = 0
     oldTop = 0
     oldBottom = 0
@@ -71,7 +71,7 @@ while a=="":
 
     breakBool = True
     calcOn = False
-    for epoch in tqdm.tqdm(range(0,100)):
+    for epoch in tqdm.tqdm(range(0,50)):
         game = Game.Game()
         while breakBool:
             if(computeDetails(game.getDetails())):
@@ -84,7 +84,7 @@ while a=="":
 
             if game.status_code in [-1, -2]:
                 if(calcOn):
-                    gameModel.train(game.status_code*10)
+                    gameModel.train(game.status_code*100)
                     calcOn = False
                 breakBool = False
             if(calcOn):
@@ -97,5 +97,5 @@ while a=="":
             game.draw()
         breakBool = True
 
-    gameModel.saveModel("models/model1")
+    gameModel.saveModel("model1")
     a = input("Retrain?")

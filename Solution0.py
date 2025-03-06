@@ -19,7 +19,7 @@ def computeDetails(inputDetails):
         return False
 
 
-gameModel = Model.loadModel("models/model1.xml",0.1,0.98,0)
+gameModel = Model.loadModel("model1.xml",0.1,0.98,0)
 oldY = 0
 oldTop = 0
 oldBottom = 0
@@ -31,10 +31,11 @@ for epoch in tqdm.tqdm(range(0,1000)):
     game = Game.Game()
     game.show()
     while breakBool:
-        time.sleep(0.01)
+        time.sleep(0.0001)
         if(computeDetails(game.getDetails())):
             calcOn = True
-            returnededPred = gameModel.compute([oldY,oldTop,oldBottom,oldX])
+            returnededPred = gameModel.getOutcome([oldY,oldTop,oldBottom,oldX])
+            print(f"Outcome is {returnededPred}")
             if(returnededPred==1):
                 game.jump()
 
