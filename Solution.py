@@ -21,8 +21,8 @@ def computeDetails(inputDetails):
         return False
 
 
-# gameModel = Model.Model(0.01,0.9,0.4,[0,1])
-gameModel = Model.loadModel("model1.xml",0.3,0.98,0)
+gameModel = Model.Model(0.01,0.9,0.4,[0,1])
+# gameModel = Model.loadModel("model1.xml",0.3,0.98,0)
 oldY = 0
 oldTop = 0
 oldBottom = 0
@@ -53,7 +53,7 @@ for epoch in tqdm.tqdm(range(0,100)):
             if(prevX<oldX):
                 gameModel.train(1000)
             prevX = oldX
-            gameModel.train(0.1)
+            gameModel.train(1)
             calcOn=False
 
         game.draw()
@@ -84,7 +84,7 @@ while a=="":
 
             if game.status_code in [-1, -2]:
                 if(calcOn):
-                    gameModel.train(game.status_code)
+                    gameModel.train(game.status_code*10)
                     calcOn = False
                 breakBool = False
             if(calcOn):
